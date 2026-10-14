@@ -7,12 +7,9 @@ description: "Draft a SQL Server stored procedure for this team's multi-tenant E
 
 이 팀의 ERP는 여러 회사(EXSIS/TEMC CNS/FST 등)가 `CompanySeq`로 구분되어 한 DB(`10.10.20.15:14233` / `EXSISMPDev`)를 같이 쓰는 멀티테넌트 구조다. 신규/확장 화면마다 스펙 엑셀을 받아 SQL Server 저장 프로시저 초안을 만드는 게 반복 작업이고, 이 스킬은 그 과정에서 실제로 여러 번 틀려본 끝에 정리된 절차다.
 
-**컨벤션 문서는 Notion에 계속 쌓이고 있다 — 이 스킬의 캐시가 아니라 Notion이 진실 공급원(source of truth)이다.** 작업을 시작할 때마다 반드시 먼저 읽는다:
+**컨벤션 문서는 `references/convention-notion-snapshot.md`에 들어있다.** 작업을 시작할 때마다 반드시 먼저 읽는다 — 원래는 Notion 페이지("수출매출품목조회 확장 컨벤션 (관리번호 · 다이나믹컬럼)")에서 계속 갱신되는 문서였지만, 모든 팀원이 Notion MCP 연결 없이도 이 스킬을 바로 쓸 수 있도록 git 저장소 안에 스냅샷으로 넣어뒀다. 이 스냅샷은 2026-10-13 기준이고, 더 최신 내용이 필요하면 관리자(kks95)에게 재동기화를 요청한다. (Notion MCP가 연결되어 있는 사람이라면 원본 페이지 https://app.notion.com/p/3f8ab591e83e81bdb071e5eee9172708 를 직접 다시 읽어서 스냅샷보다 최신인지 확인해도 좋다.)
 
-> https://app.notion.com/p/3f8ab591e83e81bdb071e5eee9172708
-> ("수출매출품목조회 확장 컨벤션 (관리번호 · 다이나믹컬럼)")
-
-이 페이지는 팀원이 계속 규칙을 추가하는 살아있는 문서다. 여기 적힌 규칙과 이 SKILL.md가 어긋나면 **Notion 쪽을 따른다.**
+이 문서에 적힌 규칙과 이 SKILL.md가 어긋나면 **컨벤션 문서 쪽을 따른다.**
 
 ## DB 접속 원칙 — 절대 쓰기 금지
 
@@ -21,7 +18,7 @@ description: "Draft a SQL Server stored procedure for this team's multi-tenant E
 ## 전체 흐름
 
 ### 0. 컨벤션 문서 읽기
-위 Notion 페이지를 `notion-fetch`로 읽는다. 매번 최신 내용이 추가되어 있을 수 있으니(새 규칙, 새 레퍼런스 파일 등) 세션 시작 시점에 한 번은 반드시 다시 읽는다 — 전에 읽은 기억에 의존하지 않는다.
+`references/convention-notion-snapshot.md`를 읽는다. 전에 읽은 기억에 의존하지 말고 세션 시작 시점에 한 번은 반드시 다시 읽는다 — 그 사이 git pull로 더 최신 스냅샷을 받았을 수 있다.
 
 ### 1. 스펙 엑셀 읽기
 스펙 엑셀은 보통 이런 시트 구성이다: 1번 시트=프로세스 설명(업무 흐름, 도식), 2번 시트=화면설계서(화면개요, 조회조건/마스터, 시트(SS1) 등 항목 정의). 둘 다 읽으면 대부분의 요구사항을 알 수 있다. `openpyxl`로 읽되, 이 셀들은 텍스트 모양으로 레이아웃을 흉내낸 "그림" 성격이 강해서 셀 좌표+값을 그대로 덤프해서 훑어보는 게 빠르다(서식/병합을 해석하려 하지 않는다). `openpyxl`이 설치 안 되어 있으면 `pip install openpyxl`부터 한다 — 이 환경엔 기본 설치가 안 되어 있다.
