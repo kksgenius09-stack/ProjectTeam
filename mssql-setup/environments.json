@@ -1,0 +1,24 @@
+{
+  "secrets": {
+    "providers": [
+      {
+        "type": "dotenv",
+        "path": "REPLACED_AT_INSTALL_TIME"
+      }
+    ]
+  },
+  "defaultEnvironment": "exsis",
+  "environments": [
+    {
+      "name": "exsis",
+      "server": "10.10.20.15",
+      "port": 14233,
+      "database": "EXSISMPDev",
+      "authMode": "sql",
+      "username": "aceexsis",
+      "password": "${secret:MSSQL_PASSWORD}",
+      "trustServerCertificate": true,
+      "readonly": true
+    }
+  ]
+}
